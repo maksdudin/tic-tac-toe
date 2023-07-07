@@ -24,7 +24,8 @@ public class Field {
     public Map<Integer, Sign> getField() {
         return field;
     }
-
+    // а вот этот метод организует стрим из map field выбирая вней по фильтру только пустые элементы
+    // и возвращает первое попавшийся индекс пустой ячейки, а если их нет, то значение -1
     public int getEmptyFieldIndex() {
         return field.entrySet().stream()
                 .filter(e -> e.getValue() == Sign.EMPTY)
@@ -39,8 +40,9 @@ public class Field {
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
     }
-
+   //метод проверяет нет трёх крестиков/ноликов в ряд
     public Sign checkWin() {
+        // в списке winPossibilitiesзабиты все возможные варианты рядов идущих подряд крестиков/ноликов
         List<List<Integer>> winPossibilities = List.of(
                 List.of(0, 1, 2),
                 List.of(3, 4, 5),
@@ -51,13 +53,13 @@ public class Field {
                 List.of(0, 4, 8),
                 List.of(2, 4, 6)
         );
-
-        for (List<Integer> winPossibility : winPossibilities) {
-            if (field.get(winPossibility.get(0)) == field.get(winPossibility.get(1))
+        // а вот что тут?
+        for (List<Integer> winPossibility : winPossibilities) {// пробегвем по всему списку списков
+            if (field.get(winPossibility.get(0)) == field.get(winPossibility.get(1))// и проеряем что значение полей по указанным индексам равны друг другу
                 && field.get(winPossibility.get(0)) == field.get(winPossibility.get(2))) {
-                return field.get(winPossibility.get(0));
+                return field.get(winPossibility.get(0));//возвращаем значение которое замостило весь ряд
             }
         }
-        return Sign.EMPTY;
+        return Sign.EMPTY;//а если нет заполненых рядов метод возвращает "пустоту"
     }
 }
