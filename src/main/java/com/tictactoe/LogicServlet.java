@@ -32,18 +32,24 @@ public class LogicServlet extends HttpServlet {
 
         // Проверяем, что ячейка, по которой был клик пустая.
         // Если она не пустая отправляем пользователя на ту же страницу без изменений
-        // параметров в сессии, русть кливает ещё раз?
+        // параметров в сессии, Пусть кликает ещё раз?
         if (Sign.EMPTY != curentSign) {
             RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/index.jsp");
             dispatcher.forward(request, response);
             return;
         }
         // а вот если пустая тогда идём дальше
-        // стаивим "крестик" в ячейке по которой кликнул игрок
+        // ставим "крестик" в ячейке по которой кликнул игрок
         // т.е по field.getField() достаём Map из класса Field и записываем в ячейку с ключём имеющем значение index Sign.CROSS
         field.getField().put(index,Sign.CROSS);
 
-        // дальше прграмма должна поставить нолик (по логике метода в первую попавшуюся пустую ячейку, что строго говоря не "мя")
+        //Проверяем не победил ли крестик последобавления последнего клика пользователя
+        if(chekWin(response,curentSession,field)){
+            return;
+        }
+
+        // дальше прграмма должна поставить нолик (по логике метода в первую попавшуюся пустую ячейку,
+        // что строго говоря не "мя")
 
         // получаем пустую я чейку поля
         int emptyFieldSign=field.getEmptyFieldIndex();
@@ -54,6 +60,23 @@ public class LogicServlet extends HttpServlet {
         if (emptyFieldSign>=0){
             field.getField().put(emptyFieldSign,Sign.NOUGHT);
         }
+        //Проверяем не победил ли крестик после добавления нолика программой
+        if(chekWin(response,curentSession,field)){
+            return;
+        }
+        if(emptyFieldSign<0){
+
+            curentSession.setAttribute("draw",true);//вводим новый атрибут ничья
+            List<Sign> data = field.getFieldData();
+
+            // Обновляем этот список в сессии
+            curentSession.setAttribute("data", data);
+
+            // Шлем редирект
+            response.sendRedirect("/index.jsp");
+            return;
+        }
+
 
         //считываем список значений карты
         List<Sign> data = field.getFieldData();

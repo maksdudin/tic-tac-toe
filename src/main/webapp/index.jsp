@@ -1,3 +1,4 @@
+<%@ page import="com.tictactoe.Sign" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <!DOCTYPE html>
@@ -6,13 +7,25 @@
     <title>Tic-Tac-Toe</title>
     <link href="static/main.css" rel="stylesheet">
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <script src="<c:url value="/static/jquery-3.6.0.min.js"/>"></script>
 </head>
 <body>
 <h1>Tic-Tac-Toe</h1>
 
-
+<!-- обавим функцию, которая умеет оправлять POST запрос на сервер. Функцию сделаем синхронной
+, и когда придет ответ с сервера – перезагрузит текущую страницу.-->
 <script>
-
+    function restart() {
+        $.ajax({
+            url: '/restart',
+            type: 'POST',
+            contentType: 'application/json;charset=UTF-8',
+            async: false,
+            success: function () {
+                location.reload();
+            }
+        });
+    }
 </script>
 
 <table>
@@ -32,5 +45,21 @@
         <td onclick="window.location='/logic?click=8'">${data.get(8).getSign()}</td>
     </tr>
 </table>
+<hr>
+<c:set var="CROSSES" value="<%=Sign.CROSS%>"/>
+<c:set var="NOUGHTS" value="<%=Sign.NOUGHT%>"/>
+<c:if test="${winner ==CROSSES}">
+    <h1>CROSSES WIN</h1>
+    <button onclick="restart()">Start again</button>
+</c:if>
+<c:if test="${winner == NOUGHTS}">
+    <h1>NOUGHTS WIN</h1>
+    <button onclick="restart()">Start again</button>
+</c:if>
+<c:if test="${draw}"><!-- если ничья -->
+    <h1>IT'S A DRAW</h1><!-- выводим IT'S A DRAW -->
+    <br> <!-- раздел -->
+    <button onclick="restart()">Start again</button><!-- делаем кнопку Start again по которой рестартим игру, функция сверху в script -->
+</c:if>
 </body>
 </html>
